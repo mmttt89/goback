@@ -19,4 +19,5 @@ func UserRouter(db *gorm.DB, r *gin.Engine) {
 	routerGroup.GET("/:id", userController.GetUserByID)
 	routerGroup.GET("/", userController.GetAll)
 	routerGroup.POST("/create", userController.AddUser)
+	routerGroup.POST("/update", userController.UpdateUser)
 }

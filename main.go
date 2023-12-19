@@ -24,7 +24,6 @@ func main() {
 	r := gin.Default()
 	route.SetupRoutes(r, db)
 
-	log.Println("before running the app")
 	r.Run(config.HostAddress)
-	log.Println("running on port 8080")
+	log.Println("App is running on port 8080")
 }

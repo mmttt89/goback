@@ -80,3 +80,29 @@ func (uc *UserController) AddUser(c *gin.Context) {
 		})
 	}
 }
+
+func (uc *UserController) UpdateUser(c *gin.Context) {
+	var updateUser model.User
+	err := c.ShouldBindJSON(&updateUser)
+
+	if err != nil {
+		errorMessage := "Failed to parse user data: " + err.Error()
+		c.IndentedJSON(http.StatusBadRequest, dto.JsonError{
+			Message: errorMessage,
+		})
+		return
+	}
+
+	isUpdated, updateError := uc.userService.UpdateUser(updateUser)
+
+	if updateError == nil && isUpdated {
+		c.IndentedJSON(http.StatusCreated, dto.JsonSuccess{
+			Data: "User Updated successfully",
+		})
+	} else {
+		errorMessage := "Failed to Update user: " + err.Error()
+		c.IndentedJSON(http.StatusInternalServerError, dto.JsonError{
+			Message: errorMessage,
+		})
+	}
+}

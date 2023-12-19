@@ -21,9 +21,14 @@ func (ur *UserRepository) FindByID(userID string) (*model.User, error) {
 	// find user from database now
 	var user model.User
 	if err := ur.database.First(&user, userID).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
-		}
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (ur *UserRepository) FindByEmail(email string) (*model.User, error) {
+	var user model.User
+	if err := ur.database.Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -38,11 +43,22 @@ func (ur *UserRepository) GetAllUsers() ([]model.User, error) {
 	return users, nil
 }
 
-func (ur *UserRepository) AddUser(newUser model.User) (model.User, error) {
+func (ur *UserRepository) AddUser(newUser model.User) (*model.User, error) {
 
 	result := ur.database.Create(&newUser)
 	if result.Error != nil {
-		return model.User{}, result.Error
+		return nil, result.Error
 	}
-	return newUser, nil
+	return &newUser, nil
+}
+
+func (ur *UserRepository) UpdateUser(updatedUser model.User) (bool, error) {
+	result := ur.database.Model(&model.User{}).Where("email = ?", updatedUser.Email).Updates(updatedUser)
+	if result.Error != nil {
+		return false, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return false, errors.New("User not found")
+	}
+	return true, nil
 }
